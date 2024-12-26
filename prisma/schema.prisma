@@ -1,0 +1,40 @@
+// Prisma schema example
+// Ensure you have a `prisma/schema.prisma` file with the following content:
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               Int         @id @default(autoincrement())
+  cpf              String      @unique
+  email            String      @unique
+  password         String
+  address          String
+  birthDate        String
+  name             String
+  cellphone        String
+  cellMobile       String
+  cellSefaz        String?
+  sectorSefaz      String?
+  numberAssociated String
+  relatives        Relatives[]
+  instagram        String?
+  threads          String?
+  facebook         String?
+}
+
+model Relatives {
+  id               Int     @id @default(autoincrement())
+  cpf              String  @unique
+  position         Int
+  name             String
+  numberAssociated String
+  User             User?   @relation(fields: [userCpf], references: [cpf])
+  userCpf          String?
+}
