@@ -38,3 +38,23 @@ model Relatives {
   User             User?   @relation(fields: [userCpf], references: [cpf])
   userCpf          String?
 }
+
+model Partner {
+  id        Int     @id @default(autoincrement())
+  cnpj      String  @unique
+  name      String
+  cellphone String
+  email     String
+  instagram String?
+  website   String?
+  note      String?
+}
+
+model Notices {
+  id       Int    @id @default(autoincrement())
+  title    String
+  content  String
+  subtitle String
+  date     String
+  image    String
+}
