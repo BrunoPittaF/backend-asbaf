@@ -22,10 +22,17 @@ const PartnerController = {
       }
 
       await sendEmail({
+        from: process.env.MAIL_USERNAME || 'caiobpfigueiredo@gmail.com',
+        subject: 'Pedido de parceria',
+        to: email,
+        text: `Olá, ${name}! Recebemos seu pedido de parceria. Em breve entraremos em contato para mais informações.`,
+      })
+
+      await sendEmail({
         from: email,
         subject: 'Pedido de parceria',
-        to: process.env.EMAIL_USER || 'caiobpfigueiredo@gmail.com',
-        text: `Olá, ${name}! Recebemos seu pedido de parceria. Em breve entraremos em contato para mais informações.`,
+        to: process.env.MAIL_USERNAME || 'caiobrunopittaf@gmail.com',
+        text: note || 'Sem mais informações adicionadas no email'
       })
 
       res.status(201).json({ partner: data });

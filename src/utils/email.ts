@@ -12,14 +12,19 @@ interface EmailOptions {
 }
 
 const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,
-  port: parseInt(process.env.EMAIL_PORT || '587', 10),
-  secure: false, // true for 465, false for other ports
+  service: 'gmail',
+  secure: true,
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
+    type: 'OAuth2',
+    user: process.env.MAIL_USERNAME,
+    clientId: process.env.OAUTH_CLIENTID,
+    clientSecret: process.env.OAUTH_CLIENT_SECRET,
+    refreshToken: process.env.OAUTH_REFRESH_TOKEN,
+    accessToken: process.env.OAUTH_ACCESS_TOKEN
+  }
 });
+
+//trocar as credencias pelas da asbaf
 
 export const sendEmail = async ({ from, to, subject, text, html }: EmailOptions): Promise<void> => {
   try {
@@ -32,7 +37,7 @@ export const sendEmail = async ({ from, to, subject, text, html }: EmailOptions)
     });
     console.log(`Email sent to ${to}`);
   } catch (error) {
-    console.error(`Failed to send email to ${to}:`, error);
+    console.error(`Failed to send email to ${to}: from : ${from}`, error);
     throw error; // Rethrow the error to handle it in calling functions
   }
 };
