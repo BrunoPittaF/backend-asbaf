@@ -30,13 +30,13 @@ model User {
 }
 
 model Relatives {
-  id               Int     @id @default(autoincrement())
-  cpf              String  @unique
+  id               Int    @id @default(autoincrement())
+  cpf              String @unique
   position         Int
   name             String
   numberAssociated String
-  User             User?   @relation(fields: [userCpf], references: [cpf])
-  userCpf          String?
+  User             User   @relation(fields: [userCpf], references: [cpf])
+  userCpf          String
 }
 
 model Partner {
@@ -51,10 +51,10 @@ model Partner {
 }
 
 model Notices {
-  id       Int    @id @default(autoincrement())
+  id       Int     @id @default(autoincrement())
   title    String
   content  String
   subtitle String
   date     String
-  image    String
+  image    String?
 }
