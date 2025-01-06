@@ -8,7 +8,8 @@
     "prisma:generate": "prisma generate",
     "build": "prisma generate && tsc",
     "start": "node dist/api/index.js",
-    "dev": "nodemon src/index.ts"
+    "dev": "nodemon src/index.ts",
+    "vercel-build": "npx prisma generate && npx prisma migrate deploy"
   },
   "author": "",
   "license": "ISC",
