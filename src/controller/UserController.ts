@@ -63,6 +63,8 @@ const UserController = {
         })
       }
 
+
+
       res.status(201).json({ user: user, relatives: relativesBD });
     } catch (error) {
       console.error(error);

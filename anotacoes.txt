@@ -1,2 +1,11 @@
 npx prisma migrate dev --name init
 npx prisma generate
+
+//sexta
+
+configurar email
+login front
+textos e imagens galerias
+form front 
+loginWall materia
+cadastro front
