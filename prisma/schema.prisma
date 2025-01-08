@@ -27,6 +27,7 @@ model User {
   instagram        String?
   threads          String?
   facebook         String?
+  Image            String?
 }
 
 model Relatives {

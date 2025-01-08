@@ -33,7 +33,7 @@ export const sendEmail = async ({ from, to, subject, text, html }: EmailOptions)
       to,
       subject,
       text,
-      html,
+      html
     });
     console.log(`Email sent to ${to}`);
   } catch (error) {

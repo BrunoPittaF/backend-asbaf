@@ -3,7 +3,9 @@ import bcrypt from 'bcrypt';
 import prisma from '../db/db';
 import jwt from 'jsonwebtoken';
 import { IRelativesBD } from '../types';
+import { sendEmail } from '../utils/email';
 const jwtSecret = process.env.JWT_SECRET || 'asuhd192and!aiusyd381a8sd67';
+
 
 function generateToken(userId: number) {
   return jwt.sign({ userId }, jwtSecret, { expiresIn: '24h' });
@@ -21,11 +23,11 @@ const translatePositionRelative = {
 const UserController = {
   registerUser: async (req: Request, res: Response) => {
     const { name, email, password, address, birthDate, cpf, cellphone, cellMobile, cellSefaz, sectorSefaz, instagram, threads, facebook, relatives } = req.body;
+    const imagePath = req.file;
 
-    let relativesBD: any = [];
-
-    if (!name || !email || !password || !address || !birthDate || !cpf || !cellphone || !cellMobile) {
+    if (!name || !email || !password || !address || !birthDate || !cpf || !cellphone || !cellMobile || !imagePath) {
       res.status(400).json({ error: 'Dados obrigatórios estão faltando no formulário' });
+      return
     }
 
     const numberAssociated = cpf + '00';
@@ -37,6 +39,7 @@ const UserController = {
 
     try {
       const hashedPassword = await bcrypt.hash(password, 10);
+
 
       const user = await prisma.user.create({
         data: {
@@ -54,21 +57,77 @@ const UserController = {
           instagram: instagram || '',
           threads: threads || '',
           facebook: facebook || '',
+          Image: imagePath.path
         },
       });
 
-      if (relatives) {
-        relativesBD = await prisma.relatives.create({
-          data: relatives
-        })
+      let relativesBD: any = [];
+      if (relatives && relatives.length > 0) {
+        relativesBD = await Promise.all(
+          relatives.map((relative: IRelativesBD) =>
+            prisma.relatives.create({
+              data: relative,
+            })
+          )
+        );
       }
 
+      const responseUser = {
+        id: user.id,
+        name: user.name,
+        address: user.address,
+        email: user.email,
+        cpf: user.cpf,
+        birthDate: user.birthDate,
+        cellphone: user.cellphone,
+        cellMobile: user.cellMobile,
+        numberAssociated: user.numberAssociated,
+        cellSefaz: user.cellSefaz || '',
+        sectorSefaz: user.sectorSefaz || '',
+        instagram: user.instagram || '',
+        threads: user.threads || '',
+        facebook: user.facebook || '',
+        Image: user.Image
+      }
 
+      await sendEmail({
+        from: email,
+        subject: 'Novo Associado!',
+        to: process.env.MAIL_USERNAME || 'asbaf94@gmail.com',
+        // to: 'caiobrunopittaf@gmail.com',
+        text: '',
+        html: `<h1>Olá, estou me associando a ASBAF! Segue os dados que acabei de enviar pelo website: </h1> 
+        <img src=${'https://backend-asbaf.vercel.app/' + user.Image} />
+        <p>Nome: ${user.name} </p>
+        <p>Endereço: ${user.address} </p>
+        <p>CPF: ${user.cpf} </p>
+        <p>Data de nascimento: ${user.birthDate} </p>
+        <p>Telefone: ${user.cellphone} </p>
+        <p>Celular: ${user.cellMobile} </p>
+        <p>Número de associado: ${user.numberAssociated} </p>
+        <p>Celular Sefaz: ${user.cellSefaz || ''} </p>
+        <p>Setor Sefaz: ${user.sectorSefaz || ''} </p>
+        <p>Setor Sefaz: ${user.sectorSefaz || ''} </p>
+        <p>Instagram: ${user.instagram || ''} </p>
+        <p>Threads: ${user.threads || ''} </p>
+        <p>Facebook: ${user.facebook || ''} </p>
+        `,
+      })
 
-      res.status(201).json({ user: user, relatives: relativesBD });
+      await sendEmail({
+        from: email,
+        subject: 'Cadastro efetuado com sucesso!',
+        to: process.env.MAIL_USERNAME || 'asbaf94@gmail.com',
+        // to: 'caiobrunopittaf@gmail.com',
+        text: 'Seja bem vindo a ASBAF!'
+      })
+
+      res.status(201).json({ user: responseUser, relatives: relativesBD || [] });
+      return
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: 'Error registering user.' });
+      return
     }
   },
   getOneUser: async (req: Request, res: Response) => {
@@ -84,6 +143,8 @@ const UserController = {
         return
       }
 
+
+
       const { password, ...userWithouPassword } = user;
 
       res.status(200).json({ user: userWithouPassword, relatives });
@@ -91,8 +152,19 @@ const UserController = {
       res.status(500).json({ error: 'Error getting user.' });
     }
   },
+  listUsers: async (req: Request, res: Response) => {
+    try {
+      const users = await prisma.user.findMany();
+      const relatives = await prisma.relatives.findMany();
+
+      users ? res.status(200).json({ users: users, relatives: relatives }) : res.status(200).json({ users: [] });
+    } catch (error) {
+      res.status(500).json({ error: 'Error getting users.' });
+    }
+  },
   login: async (req: Request, res: Response) => {
     const { cpf, password } = req.body;
+
 
     if (!cpf || !password) {
       res.status(400).json({ error: 'cpf and password are required.' });
@@ -113,8 +185,12 @@ const UserController = {
 
       const token = generateToken(user!.id);
 
-      res.status(200).json({ token });
+      console.log('login efetuado');
+
+      res.status(200).json({ token, user: user });
     } catch (error) {
+      console.log('login error');
+
       res.status(500).json({ error: 'Error logging in.' });
     }
   },
