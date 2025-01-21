@@ -24,6 +24,7 @@ router.get('/list', UserController.listUsers);
 router.post('/create', upload.single('image'), UserController.registerUser);
 router.post('/login', UserController.login);
 router.get('/:id', verifyToken, UserController.getOneUser)
+router.put('/edit/:id', verifyToken, UserController.editUser)
 
 
 export default router;

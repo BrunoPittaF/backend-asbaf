@@ -31,8 +31,9 @@ const UserController = {
     }
 
     const numberAssociated = cpf + '00';
+    let localRelatives = JSON.parse(relatives);
 
-    relatives && relatives.length > 0 && relatives.forEach((relative: IRelativesBD) => {
+    localRelatives && localRelatives.length > 0 && localRelatives.forEach((relative: IRelativesBD) => {
       relative.numberAssociated = relative.cpf + translatePositionRelative[relative.position as keyof typeof translatePositionRelative];
       relative.userCpf = cpf;
     })
@@ -62,9 +63,9 @@ const UserController = {
       });
 
       let relativesBD: any = [];
-      if (relatives && relatives.length > 0) {
+      if (localRelatives && localRelatives.length > 0) {
         relativesBD = await Promise.all(
-          relatives.map((relative: IRelativesBD) =>
+          localRelatives.map((relative: IRelativesBD) =>
             prisma.relatives.create({
               data: relative,
             })
@@ -175,6 +176,7 @@ const UserController = {
 
       if (!user) {
         res.status(404).json({ error: 'User not found.' });
+        return
       }
 
       const isPasswordValid = await bcrypt.compare(password, user!.password);
@@ -187,7 +189,11 @@ const UserController = {
 
       console.log('login efetuado');
 
-      res.status(200).json({ token, user: user });
+      const { password: userPassword, ...userWithoutPassword } = user;
+
+
+      res.status(200).json({ token, user: userWithoutPassword });
+      return;
     } catch (error) {
       console.log('login error');
 
