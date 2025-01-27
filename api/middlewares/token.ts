@@ -13,6 +13,7 @@ declare module 'express' {
 export function verifyToken(req: Request, res: Response, next: (err?: any) => void) {
   const token = req.headers.authorization;
 
+
   if (token) {
     jsonwebtoken.verify(token, process.env.JWT_SECRET!, (err) => {
       if (err) {

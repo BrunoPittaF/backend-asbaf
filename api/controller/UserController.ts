@@ -203,6 +203,7 @@ const UserController = {
   editUser: async (req: Request, res: Response) => {
     const { id } = req.params;
     const { name, email, password, address, birthDate, cpf, cellphone, cellMobile, cellSefaz, sectorSefaz, instagram, threads, facebook, relatives } = req.body;
+    const imagePath = req.file;
 
     let relativeList: IRelativesBD[] = [];
     if (!name || !email || !password || !address || !birthDate || !cpf || !cellphone || !cellMobile) {
@@ -225,6 +226,7 @@ const UserController = {
           instagram: instagram || '',
           threads: threads || '',
           facebook: facebook || '',
+          Image: imagePath?.path || '',
         },
       })
 
