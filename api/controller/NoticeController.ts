@@ -4,7 +4,8 @@ import prisma from '../db/db';
 
 const NoticeController = {
   createNotice: async (req: Request, res: Response) => {
-    const { title, content, subtitle, date, image } = req.body;
+    const { title, content, subtitle, date } = req.body;
+    const imagePath = req.file;
 
     if (!title || !content || !subtitle || !date) {
       res.status(400).json({ error: "Todos os campos são obrigatórios." });
@@ -13,7 +14,7 @@ const NoticeController = {
 
     try {
       const article = await prisma.notices.create({
-        data: { title, content, subtitle, date, image: image || '' },
+        data: { title, content, subtitle, date, image: imagePath?.path || '' },
       });
 
       res.status(201).json({ notice: article });

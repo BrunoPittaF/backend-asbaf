@@ -11,7 +11,7 @@ dotenv.config();
 
 const allowedOrigins = [
   'http://localhost:5173', // URL local de desenvolvimento
-  'https://asbaf-definitivo.vercel.app/', // URL de produção
+  'https://asbaf-definitivo.vercel.app', // URL de produção
   'https://asbaf.org' // URL de produção
 
 ];

@@ -211,11 +211,14 @@ const UserController = {
     }
 
     try {
+      const hashedPassword = await bcrypt.hash(password, 10);
+
       const updatedUser = await prisma.user.update({
         where: { id: Number(id) },
         data: {
           name,
           address,
+          password: hashedPassword,
           email,
           cpf,
           birthDate: String(new Date(birthDate)),
@@ -255,7 +258,9 @@ const UserController = {
         })
       }
 
-      res.status(200).json({ user: updatedUser, relatives: relativeList });
+      const userWithoutPassword = { ...updatedUser, password: undefined };
+
+      res.status(200).json({ user: userWithoutPassword, relatives: relativeList });
 
 
     } catch (error) {
