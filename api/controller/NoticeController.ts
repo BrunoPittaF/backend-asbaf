@@ -4,30 +4,33 @@ import prisma from '../db/db';
 
 const NoticeController = {
   createNotice: async (req: Request, res: Response) => {
-    const { title, content, subtitle, date } = req.body;
+    const { title, content, subtitle } = req.body;
     const imagePath = req.file;
 
-    if (!title || !content || !subtitle || !date) {
+    if (!title || !content || !subtitle) {
       res.status(400).json({ error: "Todos os campos são obrigatórios." });
       return
     }
 
     try {
       const article = await prisma.notices.create({
-        data: { title, content, subtitle, date, image: imagePath?.path || '' },
+        data: { title, content, subtitle, date: (String(new Date())), image: imagePath?.path || '' },
       });
 
       res.status(201).json({ notice: article });
+      return
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Erro ao criar a matéria." });
+      return
     }
   },
   editNotice: async (req: Request, res: Response) => {
     const { id } = req.params;
-    const { title, content, subtitle, date, image } = req.body;
+    const { title, content, subtitle } = req.body;
+    const imagePath = req.file;
 
-    if (!title || !content || !subtitle || !date || !id) {
+    if (!title || !content || !subtitle || !id) {
       res.status(400).json({ error: "Todos os campos são obrigatórios." });
       return
     }
@@ -49,16 +52,16 @@ const NoticeController = {
         where: {
           id: Number(id)
         },
-        data: { title, content, subtitle, date, image: image || '' },
+        data: { title, content, subtitle, image: imagePath?.path || '' },
       })
 
 
       res.status(200).json({ notice: noticeUpdated })
-
-
+      return
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Erro ao editar a matéria." });
+      return
     }
   },
   deleteNotice: async (req: Request, res: Response) => {
@@ -101,6 +104,11 @@ const NoticeController = {
     } catch (error) {
       res.status(500).json({ error: "Erro ao buscar a matéria." });
     }
+  },
+  listNotice: async (req: Request, res: Response) => {
+    const notices = await prisma.notices.findMany();
+
+    res.status(200).json({ notices })
   }
 
 }
