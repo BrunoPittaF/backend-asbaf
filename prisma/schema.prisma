@@ -49,6 +49,8 @@ model Partner {
   instagram String?
   website   String?
   note      String?
+  image     String?
+  isPartner Boolean
 }
 
 model Notices {
