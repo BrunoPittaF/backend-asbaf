@@ -3,6 +3,7 @@ import cors from 'cors';
 import userRoutes from './routes/user';
 import partnerRoutes from './routes/partner';
 import noticeRoutes from './routes/notice';
+import instaRoutes from './routes/instagram';
 
 
 import bodyParser from 'body-parser';
@@ -45,6 +46,7 @@ app.use(bodyParser.json());
 app.use('/user', userRoutes);
 app.use('/partner', partnerRoutes);
 app.use('/notice', noticeRoutes);
+app.use('/instagram', instaRoutes)
 
 
 const port = process.env.PORT || 8080;

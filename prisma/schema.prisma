@@ -61,3 +61,8 @@ model Notices {
   date     String
   image    String?
 }
+
+model InstagramURL {
+  id  Int    @id @default(autoincrement())
+  url String
+}

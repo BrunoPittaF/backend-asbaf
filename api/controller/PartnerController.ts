@@ -55,9 +55,48 @@ const PartnerController = {
     res.status(200).json({ partners });
     return
   },
+  async addPartner(req: Request, res: Response) {
+    const { cnpj, name, cellphone, email, instagram, website, note, isPartner } = req.body;
+    const image = req.file;
+    const imagePath = image?.path;
+    const localPartner = isPartner === 'true' ? true : false;
+
+    if (!cnpj || !name || !cellphone || !email) {
+      res.status(400).json({ error: 'Faltam dados o suficiente' });
+      return
+    }
+
+    const data = {
+      cnpj,
+      name,
+      cellphone,
+      email,
+      instagram: instagram || '',
+      website: website || '',
+      note: note || '',
+      isPartner: localPartner,
+      image: imagePath || ''
+    }
+
+
+    try {
+      const newPartner = await prisma.partner.create({
+        data: data
+      })
+
+      res.status(201).json({ partner: newPartner });
+      return
+    } catch (error) {
+      res.status(500).json({ error: 'Error registering partner.' });
+      return
+    }
+  },
   async registerPartner(req: Request, res: Response) {
-    const { cnpj, name, cellphone, email, instagram, website, note } = req.body;
+    const { cnpj, name, cellphone, email, instagram, website, note, isPartner } = req.body;
+    const image = req.file;
+    const imagePath = image?.path;
     const { id } = req.params;
+    const localPartner = isPartner === 'true' ? true : false;
 
     if (!id || !cnpj || !name || !cellphone || !email) {
       res.status(400).json({ error: 'Faltam dados o suficiente' });
@@ -72,8 +111,10 @@ const PartnerController = {
       instagram: instagram || '',
       website: website || '',
       note: note || '',
-      isPartner: true
+      isPartner: localPartner,
+      image: imagePath || ''
     }
+
 
     try {
       const findedPartner = await prisma.partner.update({
@@ -92,6 +133,8 @@ const PartnerController = {
   },
   async editPartner(req: Request, res: Response) {
     const { cnpj, name, cellphone, email, instagram, website, note, isPartner } = req.body;
+    const image = req.file;
+    const imagePath = image?.path;
     const { id } = req.params;
 
     if (!id || !cnpj || !name || !cellphone || !email || !isPartner) {
@@ -107,7 +150,7 @@ const PartnerController = {
       instagram: instagram || '',
       website: website || '',
       note: note || '',
-      isPartner
+      isPartner,
     }
 
     try {
@@ -116,7 +159,9 @@ const PartnerController = {
           id: Number(id)
         },
         data: data
-      })
+      });
+
+      findedPartner.image = imagePath || findedPartner.image;
 
       res.status(201).json({ partner: findedPartner });
       return
