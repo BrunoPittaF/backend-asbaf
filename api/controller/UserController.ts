@@ -144,8 +144,6 @@ const UserController = {
         return
       }
 
-
-
       const { password, ...userWithouPassword } = user;
 
       res.status(200).json({ user: userWithouPassword, relatives });
